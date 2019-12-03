@@ -1,0 +1,11 @@
+(executable
+ (name testf)
+ (libraries geoml)
+ (variants float))
+
+(alias
+ (name runtest)
+ (action
+  (progn
+   (echo "float Implementation\n")
+   (run ./testf.exe))))

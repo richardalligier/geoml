@@ -1,3 +1,5 @@
 (library
  (name geoml_float)
- (implements geoml))
+ (public_name geoml_float)
+ (implements geoml)
+ (variant float))
