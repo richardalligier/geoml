@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t = {
   c00 : num; c10 : num;
@@ -7,14 +7,14 @@ type t = {
 }
 
 let identity = {
-  c00 = (of_string "1."); c10 = (of_string "0.");
-  c01 = (of_string "0."); c11 = (of_string "1.");
-  c02 = (of_string "0."); c12 = (of_string "0.");
+  c00 = 1.; c10 = 0.;
+  c01 = 0.; c11 = 1.;
+  c02 = 0.; c12 = 0.;
 }
 
 let translation x y = {
-  c00 = (of_string "1."); c10 = (of_string "0.");
-  c01 = (of_string "0."); c11 = (of_string "1.");
+  c00 = 1.; c10 = 0.;
+  c01 = 0.; c11 = 1.;
   c02 = x; c12 = y;
 }
 
@@ -25,9 +25,9 @@ let translate x y m = {
 }
 
 let scaling s = {
-  c00 = s; c10 = (of_string "0.");
-  c01 = (of_string "0."); c11 = s;
-  c02 = (of_string "0."); c12 = (of_string "0.");
+  c00 = s; c10 = 0.;
+  c01 = 0.; c11 = s;
+  c02 = 0.; c12 = 0.;
 }
 
 let scale s m = {
@@ -43,7 +43,7 @@ let rotation angle =
   {
   c00 = ca; c10 = sa;
   c01 = ~-. sa; c11 = ca;
-  c02 = (of_string "0."); c12 = (of_string "0.");
+  c02 = 0.; c12 = 0.;
 }
 
 let rotate angle (m : t) =

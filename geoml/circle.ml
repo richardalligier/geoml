@@ -1,10 +1,10 @@
-open Arith
+open[@parse.float] Arith
 open Math
 
 type t = {center:Point.t; radius:num}
 
 let make center radius : t =
-  if radius >=(of_string "0.") then
+  if radius >=0. then
     {center;radius}
   else invalid_arg "Circle.make:radius should be positive or zero"
 
@@ -29,7 +29,7 @@ let contains (c:t) p =
 
 let area ({radius;_}:t) = pi *. radius *. radius
 
-let perimeter ({radius;_}:t) = (of_string "2.") *. pi *. radius
+let perimeter ({radius;_}:t) = 2. *. pi *. radius
 
 let proj_x (c:t) = let open Point in (c.center.x-.c.radius,c.center.x+.c.radius)
 
@@ -47,8 +47,8 @@ let intersect_line (c:t) (l:Line.t) =
   match l with
   | X(x) ->
      let a = x-.cx in
-     Math.solve (of_string "1.") (of_string "0.") (a*.a -. c.radius*.c.radius)
-     |> List.map (fun y -> Point.make x y |> Point.translate(of_string "0.") cy)
+     Math.solve 1. 0. (a*.a -. c.radius*.c.radius)
+     |> List.map (fun y -> Point.make x y |> Point.translate 0. cy)
   | _ ->
      (* we go to origin *)
      let l_2 = translate (-.cx) (-.cy) l in
@@ -57,8 +57,8 @@ let intersect_line (c:t) (l:Line.t) =
      (* x² + y² = r²   and   y = ax+b
        => x² + (ax + b)² = r²
        => x² + a²x² + 2abx + b² = r²
-       => (a²+1)x² + 2abx + b²-r² =(of_string "0.")*)
-     Math.solve (a*.a+.(of_string "1.")) ((of_string "2.")*.a*.b) (b*.b -. c.radius*.c.radius)
+       => (a²+1)x² + 2abx + b²-r² =0.*)
+     Math.solve (a*.a+.1.) (2.*.a*.b) (b*.b -. c.radius*.c.radius)
      (* we calculate the associated y*)
      (* and translate back the result to the first coordinates*)
      |> List.map (fun x -> Point.make x (a*.x+.b) |> Point.translate cx cy)
@@ -90,8 +90,8 @@ let incircle p1 p2 p3 =
   and c = Point.distance p3 p1 in
   let center = Point.barycenter [(p1,b);(p2,c);(p3,a)] in
   let radius =
-    let s =(of_string "0.5") *. (a+.b+.c) in
-    ((of_string "2.") *. sqrt (s *. (s-.a) *. (s-.b) *.(s-.c))) /. (a+.b+.c)
+    let s =(0.5) *. (a+.b+.c) in
+    (2. *. sqrt (s *. (s-.a) *. (s-.b) *.(s-.c))) /. (a+.b+.c)
   in make center radius
 
 let of_diameter p1 p2 =
@@ -138,16 +138,16 @@ let bounding (pts : Point.t list) : t =
   in
   match pts with
   | [] -> invalid_arg "can't build a bounding circle with an empty list"
-  | h::tl -> mindisk pts (make h(of_string "0.")) [h] tl
+  | h::tl -> mindisk pts (make h 0.) [h] tl
 
 let random_point (c:t) : Point.t =
-  let theta = random pi *. (of_string "2.")
+  let theta = random pi *. 2.
   and r = random (c.radius *. c.radius) |> sqrt  in
   let x = r *. (cos theta) and y = r *. (sin theta) in
   Point.(make (c.center.x+.x) (c.center.y +. y))
 
 let random_point_perimeter (c:t) : Point.t =
-  let theta = random pi *. (of_string "2.") and r = c.radius  in
+  let theta = random pi *. 2. and r = c.radius  in
   let x = r *. (cos theta) and y = r *. (sin theta) in
   Point.(make (c.center.x+.x) (c.center.y +. y))
 

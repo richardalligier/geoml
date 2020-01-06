@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t = Point.t list
 
@@ -47,12 +47,12 @@ let fold_segments_pair f acc p =
 let perimeter p =
   fold Point.(fun acc p1 p2 ->
       acc +. distance p1 p2
-    ) (of_string "0.") p
+    ) 0. p
 
 let area p =
   fold Point.(fun acc p1 p2 ->
       acc +. (p1.x *. p2.y -. p1.y *. p2.x)
-  ) (of_string "0.") p /. (of_string "2.") |> abs
+  ) 0. p /. 2. |> abs
 
 let proj_x = function
   | [] -> raise Empty
@@ -208,7 +208,7 @@ let compute_ears h p =
       let vec2 = Vector.of_points v2 v3 in
       let angle = Vector.angle_deg vec1 vec2 in
       Hashtbl.add h v2 (v1, angle, v3);
-      if angle > (of_string "180.") then (n + 1, acc)
+      if angle > (180.) then (n + 1, acc)
       else n + 1, AngleSet.add (v2, angle) acc
     ) (0, AngleSet.empty) p
 
@@ -262,8 +262,8 @@ module Convex = struct
          else if p2 = p then -1
          else
            let ccw = ccw p p1 p2 in
-           if ccw < (of_string "0.") then 1
-           else if ccw = (of_string "0.") then 0
+           if ccw < 0. then 1
+           else if ccw = 0. then 0
            else -1
        in
        let rec graham_aux cl conv =
@@ -273,7 +273,7 @@ module Convex = struct
             if h = p then graham_aux t conv
             else
               let sign = ccw b a h in
-              if sign < (of_string "0.") then graham_aux cl (b::tl)
+              if sign < 0. then graham_aux cl (b::tl)
               else graham_aux t (h::conv)
          | (h::t,_) -> graham_aux t (h::conv)
        in graham_aux (List.sort cmp l) [p]
@@ -291,7 +291,7 @@ module Convex = struct
       }
 
     let make center fst edges =
-      let snd = Point.rotate_angle center fst ((of_string "360.") /. of_int edges) in
+      let snd = Point.rotate_angle center fst ((360.) /. of_int edges) in
       { center; fst; snd; edges;
         len = Point.distance fst snd;
         apothem =
@@ -303,7 +303,7 @@ module Convex = struct
       else if nth = 0 then rp.snd
       else
         Point.rotate_angle rp.center rp.fst
-                           (of_int (nth + 1) *. ((of_string "360.") /. of_int rp.edges))
+                           (of_int (nth + 1) *. ((360.) /. of_int rp.edges))
 
     let fold_stop filter f acc rp =
       let rec aux nth acc current next =
@@ -313,7 +313,7 @@ module Convex = struct
       in aux 0 acc rp.fst (next_point rp)
 
     let perimeter rp = of_int rp.edges *. rp.len
-    let area rp = rp.len *. rp.apothem /. (of_string "2.") *. of_int rp.edges
+    let area rp = rp.len *. rp.apothem /. 2. *. of_int rp.edges
 
     let to_polygon rp =
       fold_stop (fun _ _ -> true)
@@ -321,7 +321,7 @@ module Convex = struct
                   current :: acc
                 ) [] rp
 
-    let to_randomized_polygon ?(minp=3)  ?(prob=of_string "0.5") rp =
+    let to_randomized_polygon ?(minp=3)  ?(prob=0.5) rp =
       snd @@ fold_stop (fun _ _ -> true)
                        (fun _ (nb, acc) current next ->
                          let minp = of_int minp in
@@ -329,11 +329,11 @@ module Convex = struct
                            if nb >= minp then prob
                            else max prob (minp /. (of_int rp.edges -. nb))
                          in
-                         if random (of_string "1.") > prob then (nb, acc)
+                         if random 1. > prob then (nb, acc)
                          else
-                           let rand = random (of_string "1.") in
-                           let bar = Point.barycenter [(current, rand); (next, (of_string "1.") -. rand)] in
-                           (nb +. (of_string "1."), bar :: acc)
+                           let rand = random 1. in
+                           let bar = Point.barycenter [(current, rand); (next, 1. -. rand)] in
+                           (nb +. 1., bar :: acc)
                        ) (prob, []) rp
 
     let translate dx dy rp =
@@ -357,8 +357,8 @@ module Convex = struct
     let contains rp pt =
       fold_stop
         (fun current next ->
-          ((of_string "0.") > Point.determinant current next rp.center)
-          = ((of_string "0.") > Point.determinant current next pt)
+          (0. > Point.determinant current next rp.center)
+          = (0. > Point.determinant current next pt)
         ) (fun nth _ _ _ -> nth = rp.edges) true rp
 
     let map f rp =

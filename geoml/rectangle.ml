@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t = Point.t * num * num
 
@@ -12,11 +12,11 @@ let of_diagonal p1 p2 : t =
 
 let bottom_left_corner ((p,_,_):t) = p
 
-let bottom_right_corner ((p,w,_):t) = Point.translate w (of_string "0.") p
+let bottom_right_corner ((p,w,_):t) = Point.translate w 0. p
 
 let top_right_corner ((p,w,h):t) = Point.translate w h p
 
-let top_left_corner ((p,_,h):t) = Point.translate (of_string "0.") h p
+let top_left_corner ((p,_,h):t) = Point.translate 0. h p
 
 let scale_x ((p,w,h):t) f = ((Point.scale_x p f),w*.f,h)
 
@@ -37,7 +37,7 @@ let contains ((p,w,h):t) (pt:Point.t) =
 
 let area ((_,w,h):t) = w *. h
 
-let perimeter ((_,w,h):t) = (of_string "2.") *. (w+.h)
+let perimeter ((_,w,h):t) = 2. *. (w+.h)
 
 let proj_x r = let open Point in (bottom_left_corner r).x,(bottom_right_corner r).x
 
@@ -69,8 +69,8 @@ let encompass (p1,w,h) p2 =
 
 let bounding (pts : Point.t list) : t =
   match pts with
-  | [x] -> (x,(of_string "0."),(of_string "0."))
-  | x::tl -> List.fold_left encompass (x,(of_string "0."),(of_string "0.")) tl
+  | [x] -> (x,0.,0.)
+  | x::tl -> List.fold_left encompass (x,0.,0.) tl
   | [] -> invalid_arg "can't build a bounding rectangle with an empty list"
 
 let intersect_line r l =

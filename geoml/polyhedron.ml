@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 (* FIXME : subline + redundancy check *)
 
@@ -94,8 +94,8 @@ let remove_redundancies cstrs =
 let is_empty = function
   | [] | [_]-> false
   | l ->
-     let x_neg = Constraint.(make (Line.make_y (of_string "1.") (of_string "0.")) Constraint.Gt)
-     and x_pos = Constraint.(make (Line.make_y (of_string "1.") (of_string "0.")) Constraint.Leq) in
+     let x_neg = Constraint.(make (Line.make_y 1. 0.) Constraint.Gt)
+     and x_pos = Constraint.(make (Line.make_y 1. 0.) Constraint.Leq) in
      let res = redundant x_neg l && redundant x_pos l in
      res
 
@@ -132,7 +132,7 @@ let of_polygon p =
     match pts with
     | [p1;p2] -> let line = Line.of_points p1 p2 in
                  make [Constraint.(make line Geq);Constraint.(make line Leq)]
-    | [p] -> let x = Line.make_x p.Point.x and y = Line.make_y (of_string "0.") p.Point.y in
+    | [p] -> let x = Line.make_x p.Point.x and y = Line.make_y 0. p.Point.y in
              make [Constraint.(make x Geq); Constraint.(make y Geq);
                    Constraint.(make x Leq); Constraint.(make y Leq)]
     | _ -> failwith "can't build polyhedron with no point"

@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t = Point.t * Point.t * Point.t
 
@@ -57,14 +57,14 @@ let contains (({Point.x=ax;Point.y=ay},
     ((cy -. ay) *. (px -. cx) +. (ax -. cx) *. (py -. cy)) /.
     ((by -. cy) *. (ax -. cx) +. (cx -. bx) *. (ay -. cy))
   in
-  let l3 = (of_string "1.") -. l1 -. l2 in
-  l3 > (of_string "0.") && l3 < (of_string "1.")
-  && l2 > (of_string "0.") && l2 < (of_string "1.")
-  && l1 > (of_string "0.") && l1 < (of_string "1.")
+  let l3 = 1. -. l1 -. l2 in
+  l3 > 0. && l3 < 1.
+  && l2 > 0. && l2 < 1.
+  && l1 > 0. && l1 < 1.
 
 let area ((pa,pb,pc):t) =
   let ab = Vector.of_points pa pb and ac = Vector.of_points pa pc
-  in Vector.determinant ab ac *. (of_string "0.5")
+  in Vector.determinant ab ac *. (0.5)
 
 let perimeter ((pa,pb,pc):t) =
   Point.distance pa pb +. Point.distance pb pc +. Point.distance pc pa
@@ -122,7 +122,7 @@ let angles ((pa,pb,pc):t) =
   let a1 = angle_deg (of_points pa pb) (of_points pa pc) in
   let a2 = angle_deg (of_points pb pa) (of_points pb pc) in
   let a1 = abs a1 and a2 = abs a2 in
-  let a3 = (of_string "180.") -. (a1+.a2) in
+  let a3 = (180.) -. (a1+.a2) in
   (a1,a2,a3)
 
 let centroid ((a,b,c):t) =
@@ -132,9 +132,9 @@ let centroid ((a,b,c):t) =
 
 let random_point ((a,b,c):t) : Point.t =
   let ab = Vector.of_points a b and ac = Vector.of_points a c in
-  let randab = Vector.scal_mult (random (of_string "1.")) ab
-  and randac = Vector.scal_mult (random (of_string "1.")) ac in
+  let randab = Vector.scal_mult (random 1.) ab
+  and randac = Vector.scal_mult (random 1.) ac in
   let p = Vector.move_to (Vector.add randab randac) a in
   let bc = Vector.of_points b c and bp = Vector.of_points b p in
-  if (Vector.determinant bc bp) *. Vector.determinant bc ab < of_string "0." then p
+  if (Vector.determinant bc bp) *. Vector.determinant bc ab < 0. then p
   else Point.point_reflection (Point.center b c) p

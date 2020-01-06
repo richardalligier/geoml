@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 (**The linear constraint module*)
 type comp = Lt | Gt | Leq | Geq
@@ -40,7 +40,7 @@ let contains ((l,comp):t) p =
     let open Point in
     a *. p.x +. b *. p.y +. c
   in
-  (compf comp) value(of_string "0.")
+  (compf comp) value 0.
 
 (**contains c p returns true if the point p is in the half-space defined by c*)
 let translate dx dy ((l,comp):t) =

@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t = Point.t * Point.t
 
@@ -23,7 +23,7 @@ let map f (p1, p2) = (f p1, f p2)
 let center (p1,p2) = Point.center p1 p2
 
 let equation ((p1,p2):t) t =
-  if t < (of_string "0.") || t > (of_string "1.") then
+  if t < 0. || t > 1. then
     invalid_arg "Segment.equation: parameter must be in [0. ; 1.]"
   else
     let open Point in

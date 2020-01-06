@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t =
   {
@@ -19,11 +19,11 @@ module Tbl = Hashtbl.Make (struct
   end)
 
 
-let orig = make (of_string "0.") (of_string "0.")
+let orig = make 0. 0.
 
 let center {x;y} {x=x';y=y'} =
-  let newx = if x > x' then x' +. (x-.x') /.(of_string "2.") else x +. (x' -. x)/.(of_string "2.")
-  and newy = if y > y' then y' +. (y-.y') /.(of_string "2.") else y +. (y' -. y)/.(of_string "2.")
+  let newx = if x > x' then x' +. (x-.x') /.2. else x +. (x' -. x)/.2.
+  and newy = if y > y' then y' +. (y-.y') /.2. else y +. (y' -. y)/.2.
   in make newx newy
 
 let determinant a b c =
@@ -33,15 +33,15 @@ let iso_barycenter pts =
   let rec aux pts sumx sumy nb =
     match pts with
     | [] -> make (sumx /. nb) (sumy /. nb)
-    | h::tl -> aux tl (sumx +. h.x) (sumy +. h.y) (nb +. (of_string "1."))
-  in aux pts (of_string "0.") (of_string "0.") (of_string "0.")
+    | h::tl -> aux tl (sumx +. h.x) (sumy +. h.y) (nb +. 1.)
+  in aux pts 0. 0. 0.
 
 let barycenter weighted_pts =
   let rec aux pts sumx sumy sumw =
     match pts with
     | [] -> make (sumx /. sumw) (sumy /. sumw)
     | (pt,w)::tl -> aux tl ((w*.pt.x) +. sumx) ((w*.pt.y) +. sumy) (w+.sumw)
-  in aux weighted_pts (of_string "0.") (of_string "0.") (of_string "0.")
+  in aux weighted_pts 0. 0. 0.
 
 let sq_distance ({x=a;y=b}: t) ({x=c;y=d}: t) =
   let diffX = a -. c and diffY = b -. d in

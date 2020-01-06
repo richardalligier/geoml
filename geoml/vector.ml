@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t =
   {
@@ -10,7 +10,7 @@ let print fmt {dx;dy} = Format.fprintf fmt "{dx=%a; dy=%a}" print dx print dy
 
 let make dx dy = {dx;dy}
 
-let null = make (of_string "0.") (of_string "0.")
+let null = make 0. 0.
 
 let x_coord (v:t) = v.dx
 
@@ -38,7 +38,7 @@ let determinant v1 v2 = v1.dx *. v2.dy -. v1.dy *. v2.dx
 
 let scal_mult f ({dx;dy}:t) : t = make (f*.dx) (f*.dy)
 
-let opposite v = scal_mult (~-.(of_string "1.")) v
+let opposite v = scal_mult (~-.1.) v
 
 let add (v1:t) (v2:t) : t = make (v1.dx+.v2.dx) (v1.dy+.v2.dy)
 
@@ -47,7 +47,7 @@ let substract v1 v2 = opposite v2 |> add v1
 let move_to ({dx;dy}:t) = Point.translate dx dy
 
 let projection v1 v2 =
-  scal_mult ((of_string "1.") /. magnitude_sq v2) (scal_mult (dot_product v1 v2) v2)
+  scal_mult (1. /. magnitude_sq v2) (scal_mult (dot_product v1 v2) v2)
 
 let angle v1 v2 =
   let sens = make v2.dy (-.v2.dx) in
@@ -55,7 +55,7 @@ let angle v1 v2 =
   and y = dot_product v1 sens in
   atan2 y x
 
-let angle_deg v1 v2 = (of_string "57.2958") *. (angle v1 v2)
+let angle_deg v1 v2 = 57.2958 *. (angle v1 v2)
 
 let reflect a o =
   let b = projection a o in

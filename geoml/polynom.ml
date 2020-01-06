@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 type t = num list
 
@@ -6,12 +6,12 @@ let make (l:num list) : t = l
 
 let zero = []
 
-let one = [(of_string "1.")]
+let one = [1.]
 
 let equation p f =
   List.fold_left
     (fun (pow,res) coeff -> (pow+1),(res+.coeff*.(f**pow)))
-    (0,(of_string "0."))
+    (0,0.)
     (List.rev p)
  |> snd
 

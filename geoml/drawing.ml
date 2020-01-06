@@ -1,4 +1,4 @@
-open Graphics
+open[@parse.float] Graphics
 
 (* conversion utilities *)
 let iof = int_of_float
@@ -207,7 +207,7 @@ let fill_polyhedron ?(lw=1) plhd col =
  *   let open Polynom in
  *   let step = 5.
  *   and cur = ref 5. in
- *   moveto 0 (Arith.to_int (equation pol (Arith.of_string "0.")));
+ *   moveto 0 (Arith.to_int (equation pol (Arith.0.)));
  *   while !cur < (Arith.num_of_int (size_x ())) do
  *     lineto (iof !cur) (iof (equation pol !cur));
  *     cur := !cur +. step
@@ -237,7 +237,7 @@ let draw_bspline ?(lw=1) curve col =
   let a = (points curve 200) in
   moveto_p (List.hd a);
   List.iter lineto_p (List.tl a);
-  let c = Circle.make (List.hd a) (Arith.of_string "5.") in
+  let c = Circle.make (List.hd a) (Arith.of_int 5) in
   fill_circle c red
 
 (* string drawing *)

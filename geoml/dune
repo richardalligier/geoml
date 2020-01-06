@@ -4,4 +4,5 @@
   (public_name geoml)
   (name geoml)
   (virtual_modules arith)
+  (preprocess (staged_pps ppx_wideopen))
   (libraries graphics))

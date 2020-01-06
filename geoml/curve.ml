@@ -1,4 +1,4 @@
-open Arith
+open[@parse.float] Arith
 
 module Quadratic = struct
   (** This module provides basic operations over quadratic bezier curves *)
@@ -18,13 +18,13 @@ module Quadratic = struct
     with t belong to [0.;1.]*)
   let equation (p0,p1,p2) t =
     let b =
-      let a = ((of_string "1.")-.t)*.((of_string "1.")-.t)
-      and b = (of_string "2.")*.t *.((of_string "1.")-.t)
+      let a = (1.-.t)*.(1.-.t)
+      and b = 2.*.t *.(1.-.t)
       and c = t*.t in
       fun c1 c2 c3 -> a *. c1 +. b *. c2 +. c *. c3
     in
     let open Point in
-    if t <= (of_string "1.") && t >=(of_string "0.") then
+    if t <= 1. && t >=0. then
       let x = b p0.x p1.x p2.x
       and y = b p0.y p1.y p2.y
       in make x y
@@ -34,9 +34,9 @@ module Quadratic = struct
     on the bezier curve b.*)
   let points b nb =
     if nb <= 0 then [] else
-      let res = ref [] and cur = ref(of_string "0.")
-          and step = (of_string "1.") /. (of_int nb) in
-      while !cur <= (of_string "1.") do
+      let res = ref [] and cur = ref 0.
+          and step = 1. /. (of_int nb) in
+      while !cur <= 1. do
         res := (equation b (!cur))::(!res);
         cur := !cur +. step
       done;
@@ -68,18 +68,18 @@ module Cubic = struct
   (** equation t with t belong to [0.;1.]*)
   let equation (p0,p1,p2,p3) t =
     let open Point in
-    if t <= (of_string "1.") && t >=(of_string "0.") then
-      let m_t = ((of_string "1.") -. t) *. ((of_string "1.") -. t)
+    if t <= 1. && t >=0. then
+      let m_t = (1. -. t) *. (1. -. t)
       and t_2 = t*.t in
       let x =
-        p0.x *. m_t *. ((of_string "1.") -. t) +.
-          (of_string "3.") *. p1.x *. t *. m_t +.
-          (of_string "3.") *. p2.x *. t_2 *. ((of_string "1.") -. t) +.
+        p0.x *. m_t *. (1. -. t) +.
+          (3.) *. p1.x *. t *. m_t +.
+          (3.) *. p2.x *. t_2 *. (1. -. t) +.
           p3.x *. t_2 *. t
       and y =
-        p0.y *. m_t *. ((of_string "1.") -. t) +.
-          (of_string "3.") *. p1.y *. t *. m_t +.
-          (of_string "3.") *. p2.y *. t_2 *. ((of_string "1.") -. t) +.
+        p0.y *. m_t *. (1. -. t) +.
+          (3.) *. p1.y *. t *. m_t +.
+          (3.) *. p2.y *. t_2 *. (1. -. t) +.
           p3.y *. t_2 *. t
       in make x y
     else failwith "Curve.equation: t must be in [0. ; 1.]"
@@ -90,7 +90,7 @@ module Cubic = struct
       match pts with
       | w::x::y::z::tl -> aux ((make w x y z)::res) (z::tl)
       | x::y::z::[] -> List.rev ((make x (Point.center x y) y z)::res)
-      | x::y::_ -> List.rev ((make x (Point.barycenter [x,(of_string "2."); y,(of_string "1.")]) (Point.barycenter [x,(of_string "1."); y,(of_string "2.")])y)::res)
+      | x::y::_ -> List.rev ((make x (Point.barycenter [x,2.; y,1.]) (Point.barycenter [x,1.; y,2.])y)::res)
       | x::_ -> List.rev ((make x x x x)::res)
       | _ -> List.rev res
     in aux [] pts
@@ -99,9 +99,9 @@ module Cubic = struct
     on the bezier curve b.*)
   let points b nb =
     if nb <= 0 then [] else
-      let res = ref [] and cur = ref(of_string "0.")
-          and step = (of_string "1.") /. (of_int nb) in
-      while !cur <= (of_string "1.") do
+      let res = ref [] and cur = ref 0.
+          and step = 1. /. (of_int nb) in
+      while !cur <= 1. do
         res := (equation b (!cur))::(!res);
         cur := !cur +. step
       done;
@@ -123,15 +123,15 @@ module BSpline = struct
   (** make_eq pts nb_knots, makes a cardinal B-spline
      with a constant separation, 1/(nb_knots-1), between knots*)
   let make_eq pts nb_knots =
-    let step = (of_string "1.") /. (of_int (nb_knots-1))
-    and tmp = ref(of_string "0.")
+    let step = 1. /. (of_int (nb_knots-1))
+    and tmp = ref 0.
     in
     let next () =
       let res = !tmp in
       tmp:=!tmp +. step;
       res
     in
-    let k = Array.make nb_knots (of_string "0.") |> Array.map (fun _ -> next())
+    let k = Array.make nb_knots 0. |> Array.map (fun _ -> next())
     in
     (*Array.iter (fun e -> print_float e; print_newline()) k;*)
     make pts k
@@ -141,17 +141,17 @@ module BSpline = struct
   let ending {control;_} = Common.List.last control
 
   let equation {knots;control;_} t =
-    if t <(of_string "0.") || t > (of_string "1.") then failwith "t must be in [0. ; 1.]"
+    if t <0. || t > 1. then failwith "t must be in [0. ; 1.]"
     else
       let rec s1 j d x = (x -. knots.(j-1)) /. (knots.(j+d-1) -. knots.(j-1)) *. bspl j (d-1) x
       and s2 j d x =(knots.(j+d) -. x)/.(knots.(j+d) -. knots.(j)) *. bspl (j+1) (d-1) x
       and bspl j d x =
-	      if j < 0 || j >= d then(of_string "0.")
+	      if j < 0 || j >= d then 0.
 	      else if d = 0
-	      then (if knots.(j-1) <= x && x <= knots.(j) then (of_string "1.") else(of_string "0."))
+	      then (if knots.(j-1) <= x && x <= knots.(j) then 1. else 0.)
 	      else
 	        if knots.(j-1) = knots.(j+d)
-	        then(of_string "0.")
+	        then 0.
 	        else if knots.(j-1) < knots.(j+d-1) && knots.(j) = knots.(j+d)
 	        then s1 j d x
 	        else if knots.(j-1) = knots.(j+d-1) &&  knots.(j) < knots.(j+d)
@@ -175,9 +175,9 @@ module BSpline = struct
 
   let points b nb =
     if nb <= 0 then [] else
-      let res = ref [] and cur = ref(of_string "0.")
-          and step = (of_string "1.") /. (of_int nb) in
-      while !cur <= (of_string "1.") do
+      let res = ref [] and cur = ref 0.
+          and step = 1. /. (of_int nb) in
+      while !cur <= 1. do
 	      res := (equation b (!cur))::(!res);
 	      cur := !cur +. step
       done;
