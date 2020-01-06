@@ -1,5 +1,6 @@
 (library
  (name geoml_zarith)
+ (public_name geoml_zarith)
  (implements geoml)
  (libraries zarith)
- (variant zarith))
+ (variant rational))

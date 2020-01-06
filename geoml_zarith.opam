@@ -18,9 +18,10 @@ depends: [
   "ocaml" {>= "4.04.0"}
   "dune"  {>= "1.11"}
   "ppx_wideopen"
+  "zarith"
   "odoc" {with-doc}
   "qcheck" {with-test}
 ]
 
-synopsis: "Geoml_Float: 2D Geometry library for OCaml using floatting point precision"
-description: "Geoml_Float is the float backend of the Geoml Library. It is a 2D geometry for OCaml that provides basic euclidean geometry types (point, line, circle ...) and useful operations over those types. Computations are made using floatting point precision"
+synopsis: "Geoml_Zarith: 2D Geometry library for OCaml using arbitrary precision"
+description: "Geoml_Zarith is the rational backend of the Geoml Library. It is a 2D geometry for OCaml that provides basic euclidean geometry types (point, line, circle ...) and useful operations over those types. Computations are made using zarith's rationals"

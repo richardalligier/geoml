@@ -90,7 +90,7 @@ let incircle p1 p2 p3 =
   and c = Point.distance p3 p1 in
   let center = Point.barycenter [(p1,b);(p2,c);(p3,a)] in
   let radius =
-    let s =(0.5) *. (a+.b+.c) in
+    let s = (a+.b+.c) /. 2. in
     (2. *. sqrt (s *. (s-.a) *. (s-.b) *.(s-.c))) /. (a+.b+.c)
   in make center radius
 
