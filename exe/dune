@@ -1,11 +1,10 @@
 (executable
  (name testf)
  (libraries geoml)
+ (preprocess (staged_pps ppx_wideopen))
  (variants float))
 
 (alias
  (name runtest)
- (action
-  (progn
-   (echo "float Implementation\n")
-   (run ./testf.exe))))
+ (action (run ./testf.exe)))
+

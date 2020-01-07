@@ -17,7 +17,7 @@ val cos : t -> t
 val sin : t -> t
 val atan2 : t -> t -> t
 
-val random : num -> num
+val random : t -> t
 
 val of_string : string -> t
 val to_string : t -> string
