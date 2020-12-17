@@ -40,6 +40,17 @@ let intersects (c1:t) (c2:t) =
 (** line_intersection takes a circle and line and returns the list of the
     intersection points. (can be [], [a] or [a,b] *)
 let intersect_line (c:t) (l:Line.t) =
+  let cl = Line.orth_proj l c.center in
+  let d = Point.distance cl c.center in
+  if  d = c.radius
+  then [cl]
+  else if d > c.radius
+  then []
+  else
+    let dp = sqrt (c.radius *. c.radius -. d*.d) in
+    let v = Vector.normalize (Vector.make (-.l.Line.b) l.Line.a) in
+    List.map (fun v -> Vector.move_to v cl) [Vector.scal_mult dp v;Vector.scal_mult (-.dp) v]
+  (*
   let cx = c.center.Point.x and cy = c.center.Point.y in
   let open Line in
   match l with
@@ -59,7 +70,7 @@ let intersect_line (c:t) (l:Line.t) =
      Math.solve (a*.a+.1.) (2.*.a*.b) (b*.b -. c.radius*.c.radius)
      (* we calculate the associated y*)
      (* and translate back the result to the first coordinates*)
-     |> List.map (fun x -> Point.make x (a*.x+.b) |> Point.translate cx cy)
+     |> List.map (fun x -> Point.make x (a*.x+.b) |> Point.translate cx cy)*)
 
 let segment_intersection c (s:Segment.t) =
       let (a,b)= s in
