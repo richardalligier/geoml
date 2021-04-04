@@ -83,11 +83,18 @@ let segment_intersection c (s:Segment.t) =
 let tangent {center;_} p =
   Line.perpendicular_of_line (Line.of_points center p) p
 
-let intersection (c:t) (c':t) =
-  let c1_c2 = Line.of_points c.center c'.center in
-  let p = Point.barycenter [(c.center,c.radius);(c'.center,c'.radius)] in
+let intersection (c1:t) (c2:t) =
+  let c1_c2 = Line.of_points c1.center c2.center in
+  let r1 = radius c1 in
+  let r2 = radius c2 in
+  let p12 = Vector.of_points c1.center c2.center in
+  let d12 = Vector.magnitude p12 in
+  let p2ominusp1o = 0.5 *. (r2 *. r2 -. r1 *. r1) /. (d12 *. d12) in
+  let sp12 = Vector.scal_mult (-.p2ominusp1o) p12 in
+  let p = Vector.move_to sp12 (Point.iso_barycenter [c1.center;c2.center]) in
   let l = Line.perpendicular_of_line c1_c2 p in
-  intersect_line c l
+  Printf.printf "\ncompute intersection%!";
+  intersect_line c1 l
 
 let circumscribed p1 p2 p3 =
   let b1 = Line.point_bissection p1 p2
