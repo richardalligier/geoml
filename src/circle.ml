@@ -40,6 +40,17 @@ let intersects (c1:t) (c2:t) =
 (** line_intersection takes a circle and line and returns the list of the
     intersection points. (can be [], [a] or [a,b] *)
 let intersect_line (c:t) (l:Line.t) =
+  let cl = Line.orth_proj l c.center in
+  let d = Point.distance cl c.center in
+  if  d = c.radius
+  then [cl]
+  else if d > c.radius
+  then []
+  else
+    let dp = sqrt (c.radius *. c.radius -. d*.d) in
+    let v = Vector.normalize (Vector.make (-.l.Line.b) l.Line.a) in
+    List.map (fun v -> Vector.move_to v cl) [Vector.scal_mult dp v;Vector.scal_mult (-.dp) v]
+  (*
   let cx = c.center.Point.x and cy = c.center.Point.y in
   let open Line in
   match l with
@@ -59,7 +70,7 @@ let intersect_line (c:t) (l:Line.t) =
      Math.solve (a*.a+.1.) (2.*.a*.b) (b*.b -. c.radius*.c.radius)
      (* we calculate the associated y*)
      (* and translate back the result to the first coordinates*)
-     |> List.map (fun x -> Point.make x (a*.x+.b) |> Point.translate cx cy)
+     |> List.map (fun x -> Point.make x (a*.x+.b) |> Point.translate cx cy)*)
 
 let segment_intersection c (s:Segment.t) =
       let (a,b)= s in
@@ -72,11 +83,17 @@ let segment_intersection c (s:Segment.t) =
 let tangent {center;_} p =
   Line.perpendicular_of_line (Line.of_points center p) p
 
-let intersection (c:t) (c':t) =
-  let c1_c2 = Line.of_points c.center c'.center in
-  let p = Point.barycenter [(c.center,c.radius);(c'.center,c'.radius)] in
+let intersection (c1:t) (c2:t) =
+  let c1_c2 = Line.of_points c1.center c2.center in
+  let r1 = radius c1 in
+  let r2 = radius c2 in
+  let p12 = Vector.of_points c1.center c2.center in
+  let d12 = Vector.magnitude p12 in
+  let p2ominusp1o = 0.5 *. (r2 *. r2 -. r1 *. r1) /. (d12 *. d12) in
+  let sp12 = Vector.scal_mult (-.p2ominusp1o) p12 in
+  let p = Vector.move_to sp12 (Point.iso_barycenter [c1.center;c2.center]) in
   let l = Line.perpendicular_of_line c1_c2 p in
-  intersect_line c l
+  intersect_line c1 l
 
 let circumscribed p1 p2 p3 =
   let b1 = Line.point_bissection p1 p2
