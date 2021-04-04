@@ -93,7 +93,6 @@ let intersection (c1:t) (c2:t) =
   let sp12 = Vector.scal_mult (-.p2ominusp1o) p12 in
   let p = Vector.move_to sp12 (Point.iso_barycenter [c1.center;c2.center]) in
   let l = Line.perpendicular_of_line c1_c2 p in
-  Printf.printf "\ncompute intersection%!";
   intersect_line c1 l
 
 let circumscribed p1 p2 p3 =
