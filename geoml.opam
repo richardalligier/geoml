@@ -17,6 +17,7 @@ build: [
 depends: [
   "ocaml" {>= "4.04.0"}
   "dune"  {>= "1.11"}
+  "lacaml"
   "odoc" {with-doc}
   "qcheck" {with-test}
 ]

@@ -1,8 +1,7 @@
 (** This module provides basic operation over the linear equation type *)
 
-type t = private
-	 | X of float
-	 | Y of float * float
+type t = private {a:float;b:float;c:float}
+
 (** the linear equation type *)
 
 val print : Format.formatter -> t -> unit
@@ -65,6 +64,11 @@ val y_from_x : t -> float -> float
     raises Parallel if 'line' doesn't intersect the vertical line going through 'x'
 *)
 
+val eval : t -> Point.t -> float
+(**
+compute ax+by+c
+ *)
+  
 val contains : t -> Point.t -> bool
 (** contains l1 p returns true if l1goes through p. false otherwise.*)
 
