@@ -47,7 +47,10 @@ let to_string l = (function
 let of_points (p1:Point.t) (p2:Point.t) =
   let open Point in
   if p1 = p2 then
-    raise (Error (Same_coordinates p1))
+    let e = Same_coordinates p1 in
+    print_error Format.std_formatter e;
+    Point.print Format.std_formatter p2;
+    raise (Error e)
   else
     let dx = p2.x -. p1.x in
     let dy = p2.y -. p1.y in

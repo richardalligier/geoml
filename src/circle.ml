@@ -1,8 +1,10 @@
 open Math
 
+   
 type t = {center:Point.t; radius:float}
 
 let make center radius : t =
+(*  Printf.printf "\ncenter (%f,%f) radius %f %!" (Point.x_coord center) (Point.y_coord center) radius;*)
   if radius >= 0. then
     {center;radius}
   else invalid_arg "Circle.make:radius should be positive or zero"
